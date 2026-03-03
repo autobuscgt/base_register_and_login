@@ -6,14 +6,15 @@ const bcrypt = require('bcrypt')
 const sequelize = require('./config/db')
 const jwt = require('jsonwebtoken');
 const { User } = require('./models/user');
+
 const authMiddleware = require('./middleware/authMiddleware');
 const checkRolemiddleware = require('./middleware/checkRolemiddleware');
-const SECRET_KEY = 'akjsfklafs'
+
 app.use(cors())
 app.use(express.json())
 
 const generateJWT = (login,role) => {
-    return jwt.sign({login,role},SECRET_KEY,{expiresIn:'24h'})
+    return jwt.sign({login,role},process.env.SECRET_KEY,{expiresIn:'24h'})
 }
 
 app.get('/admin_route',checkRolemiddleware('ADMIN'),(req,res)=>{
