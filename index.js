@@ -10,6 +10,7 @@ const { User } = require('./models/user');
 
 const authMiddleware = require('./middleware/authMiddleware');
 const checkRolemiddleware = require('./middleware/checkRolemiddleware');
+const { Cars } = require('./models/cars');
 
 app.use(cors())
 app.use(express.json())
@@ -18,12 +19,31 @@ const generateJWT = (login,role) => {
     return jwt.sign({login,role},process.env.SECRET_KEY,{expiresIn:'24h'})
 }
 
-app.get('/admin_route',checkRolemiddleware('ADMIN'),(req,res)=>{
-    return res.send('Administrator access');
+app.post('/car',checkRolemiddleware('ADMIN'),async(req,res)=>{
+    const {name,year,price} = req.body;
+    await Cars.create({name,year,price});
+    return res.send('Машина успешно добавлена')
+});
+app.delete('/:id',checkRolemiddleware('ADMIN'),async(req,res)=>{
+    const {id} = req.params;
+    const candidate = await Cars.findByPk(id)
+    if(!candidate){return req.send('Не найдено')}
+    await candidate.destroy()
+    return res.send('Машина успешно добавлена')
+});
+app.update('/:id',checkRolemiddleware('ADMIN'),async(req,res)=>{
+    const {id} = req.params
+    const {name,year,price} = req.body;
+    const candidate = await Cars.findByPk(id)
+    if(!candidate){return req.send('Не найдено')}
+    await candidate({name,year,price})
+    return res.send('Машина успешно обновлена')
+});
+app.get('/cars',authMiddleware,async(req,res)=>{
+    const cars = await Cars.findAll();
+    return res.send(cars)
 })
-app.get('/',authMiddleware,(req,res)=>{
-    return res.send('hello from backend')
-})
+
 app.post('/register',async(req,res)=>{
     const {login,password,role} = req.body
     const candidate = await User.findOne({where:{login}})
