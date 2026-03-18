@@ -46,7 +46,7 @@ app.put('/cars/:id',checkRolemiddleware('ADMIN'),async(req,res)=>{
     const {name,year,price} = req.body;
     const candidate = await Cars.findByPk(id)
     if(!candidate){return req.send('Не найдено')}
-    await candidate({name,year,price})
+    await candidate.update({name,year,price})
     return res.send('Машина успешно обновлена')
 });
 
