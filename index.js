@@ -15,6 +15,13 @@ const { generateJWT } = require('./middleware/jwtFunction');
 app.use(cors())
 app.use(express.json())
 
+// ============ ФУНКЦИЯ ГЕНЕРАЦИИ ТОКЕНА =============== //
+
+const generateJWT = (login,role) => {
+    return jwt.sign({login,role},process.env.SECRET_KEY,{expiresIn:'24h'})
+}
+
+
 // ================= БАЗОВЫЕ МАРШРУТЫ ================= //
 
 //Добавление транспорта
