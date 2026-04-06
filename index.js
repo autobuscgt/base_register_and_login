@@ -1,26 +1,28 @@
 require('dotenv').config()
+// ========== ВСЕ ИМПОРТЫ СВЯЗАННЫЕ С СЕРВЕРОМ ========== //
 const express = require('express')
 const app = express()
 const PORT = 7000;
 const cors = require('cors');
+
+// ========== ВСЕ ИМПОРТЫ СВЯЗАННЫЕ С БАЗОЙ ДАННЫХ ========== //
 const bcrypt = require('bcrypt')
 const sequelize = require('./config/db')
 const { User } = require('./models/user');
+const { Cars } = require('./models/cars');
 
+// ========== ВСЕ ИМПОРТЫ СВЯЗАННЫЕ С ТОКЕНОМ ========== //
+const jwt = require('jsonwebtoken')
 const authMiddleware = require('./middleware/authMiddleware');
 const checkRolemiddleware = require('./middleware/checkRolemiddleware');
-const { Cars } = require('./models/cars');
-const { generateJWT } = require('./middleware/jwtFunction');
 
 app.use(cors())
 app.use(express.json())
 
 // ============ ФУНКЦИЯ ГЕНЕРАЦИИ ТОКЕНА =============== //
-
 const generateJWT = (login,role) => {
     return jwt.sign({login,role},process.env.SECRET_KEY,{expiresIn:'24h'})
 }
-
 
 // ================= БАЗОВЫЕ МАРШРУТЫ ================= //
 
@@ -35,9 +37,9 @@ app.post('/cars',checkRolemiddleware('ADMIN'),async(req,res)=>{
 app.delete('/cars/:id',checkRolemiddleware('ADMIN'),async(req,res)=>{
     const {id} = req.params;
     const candidate = await Cars.findByPk(id)
-    if(!candidate){return req.send('Не найдено')}
+    if(!candidate){return res.send('Не найдено')}
     await candidate.destroy()
-    return res.send('Машина успешно добавлена')
+    return res.send('Машина успешно удалена')
 });
 
 //Обновление объекта по ID
@@ -45,7 +47,7 @@ app.put('/cars/:id',checkRolemiddleware('ADMIN'),async(req,res)=>{
     const {id} = req.params
     const {name,year,price} = req.body;
     const candidate = await Cars.findByPk(id)
-    if(!candidate){return req.send('Не найдено')}
+    if(!candidate){return res.send('Не найдено')}
     await candidate.update({name,year,price})
     return res.send('Машина успешно обновлена')
 });
