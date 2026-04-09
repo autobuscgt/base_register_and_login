@@ -50,10 +50,6 @@ const User = sequelize.define('user', {
             'PREMIUM_USER',
             // Вариант 12: Appointment
             'PATIENT', 'DOCTOR',
-            // Вариант 13: Achievement
-            'PLAYER', 'GAME_MASTER',
-            // Вариант 14: Document
-            'HR', 'CEO'
         ),
         defaultValue: 'USER',
         allowNull: false
